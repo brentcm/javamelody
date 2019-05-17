@@ -57,6 +57,23 @@ public class TestStatsD {
 		statsd.stop();
 	}
 
+	/** Test setting custom metric type
+	 * @throws IOException e */
+	@Test
+	public void testMetricType() throws IOException {
+		Statsd statsd = Statsd.getInstance("/test", "hostname");
+		assertNull("getInstance", statsd);
+		setProperty(Parameter.STATSD_ADDRESS, "localhost:8125");
+		setProperty(Parameter.STATSD_METRIC_TYPE, "f");
+		statsd = Statsd.getInstance("/test", "hostname");
+		assertNotNull("getInstance", statsd);
+		statsd.addValue("metric", 1);
+		statsd.addValue("metric", 2);
+		statsd.addValue("metric", 3);
+		statsd.send();
+		statsd.stop();
+	}
+
 	private static void setProperty(Parameter parameter, String value) {
 		Utils.setProperty(parameter, value);
 	}
