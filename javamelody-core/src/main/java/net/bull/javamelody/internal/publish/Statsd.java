@@ -49,16 +49,18 @@ class Statsd extends MetricsPublisher {
 
 	private final InetSocketAddress address;
 	private final String prefix;
+	private final String metricType;
 
 	private final DecimalFormat decimalFormat = new DecimalFormat("0.00",
 			DecimalFormatSymbols.getInstance(Locale.US));
 	private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 	private final Writer bufferWriter = new OutputStreamWriter(buffer, Charset.forName("UTF-8"));
 
-	Statsd(InetAddress host, int port, String prefix) {
+	Statsd(InetAddress host, int port, String prefix, String metricType) {
 		super();
 		this.address = new InetSocketAddress(host, port);
 		this.prefix = prefix;
+		this.metricType = (metricType != null) ? metricType : "g";
 	}
 
 	static Statsd getInstance(String contextPath, String hostName) {
@@ -66,6 +68,7 @@ class Statsd extends MetricsPublisher {
 		if (statsdAddress != null) {
 			assert contextPath != null;
 			assert hostName != null;
+			final String statsdMetricType = Parameter.STATSD_METRIC_TYPE.getValue();
 			final String address;
 			final int port;
 			final int index = statsdAddress.lastIndexOf(':');
@@ -82,7 +85,7 @@ class Statsd extends MetricsPublisher {
 			final String prefix = "javamelody." + contextPath.replace("/", "") + '.' + hostName
 					+ '.';
 			try {
-				return new Statsd(InetAddress.getByName(address), port, prefix);
+				return new Statsd(InetAddress.getByName(address), port, prefix, statsdMetricType);
 			} catch (final UnknownHostException e) {
 				throw new IllegalArgumentException("Invalid host: " + address, e);
 			}
@@ -96,7 +99,8 @@ class Statsd extends MetricsPublisher {
 		// String.format(Locale.ENGLISH, "%s:%s|c", key, magnitude) to increment a counter
 		// String.format(Locale.ENGLISH, "%s:%s|g", key, value) for a gauge value
 		bufferWriter.append(prefix).append(metric).append(':');
-		bufferWriter.append(decimalFormat.format(value)).append("|g\n");
+		bufferWriter.append(decimalFormat.format(value)).append("|");
+		bufferWriter.append(this.metricType).append("\n");
 	}
 
 	@Override

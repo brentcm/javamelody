@@ -367,6 +367,11 @@ public enum Parameter {
 	STATSD_ADDRESS("statsd-address"),
 
 	/**
+	 * Metric type to be sent with statsd metrics.  "g" by default.  Ignored if statsd-address is not set.
+	 */
+	STATSD_METRIC_TYPE("statsd-metric-type"),
+
+	/**
 	 * Namespace to use in <a href='https://aws.amazon.com/cloudwatch/'>AWS CloudWatch</a> to send metrics,
 	 * for example "MyCompany/MyAppDomain" (null by default).
 	 */
