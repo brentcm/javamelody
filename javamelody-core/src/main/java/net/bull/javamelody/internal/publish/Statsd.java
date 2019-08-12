@@ -79,7 +79,9 @@ class Statsd extends MetricsPublisher {
 			}
 			// contextPath est du genre "/testapp"
 			// hostName est du genre "www.host.com"
-			final String prefix = "javamelody." + contextPath.replace("/", "") + '.' + hostName
+			final int underscoreIndex = hostName.indexOf("_");
+			final String actualHostName = underscoreIndex > -1 ? hostName.substring(0, underscoreIndex) : hostName;
+			final String prefix = "javamelody." + contextPath.replace("/", "") + '.' + actualHostName
 					+ '.';
 			try {
 				return new Statsd(InetAddress.getByName(address), port, prefix);
